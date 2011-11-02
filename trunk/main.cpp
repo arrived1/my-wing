@@ -7,11 +7,13 @@
 #include <stdio.h>
 #include <GL/glut.h>
 #include "kernels.h"
+
 GLuint pointsVBO;
 float2 *pointsVBO_device;		// device pointer for VBO
 struct cudaGraphicsResource *pointsVBO_Resource;
 float2 points[N];
 float2 velocities[N];
+
 void init(void)
 {
 	// GLEW library
@@ -39,6 +41,7 @@ void init(void)
 	glEnable(GL_BLEND);	// http://www.pcworld.pl/artykuly/44799/Przezroczystosc.i.mgla.html
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);		
 }
+
 void changeSize(int w, int h) 
 {
 	float ratio = 1.0 * w / h;
@@ -48,6 +51,7 @@ void changeSize(int w, int h)
 	gluOrtho2D(-1,1,-1,1);
 	glMatrixMode(GL_MODELVIEW);
 }
+
 void renderScene(void) 
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -62,6 +66,7 @@ void renderScene(void)
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glutSwapBuffers();
 }
+
 void idleFunction(void)
 {
 	// -- timer
@@ -88,11 +93,14 @@ void idleFunction(void)
 	printf("%f\n",time/MILISEC);
 	glutPostRedisplay();
 }
-void keyFunction(unsigned char key, int x, int y) {
+
+void keyFunction(unsigned char key, int x, int y) 
+{
 
 	if (key == 27)
 		exit(0);
 }
+
 int main(int argc, char **argv)
 {
 	cudaGLSetGLDevice(0);
