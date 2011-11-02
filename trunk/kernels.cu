@@ -1,11 +1,13 @@
 #include <cuda.h>
 #include "kernels.h"
+
 #define THREADS_PER_BLOCK 64
 const int NUM_BLOCKS = N / THREADS_PER_BLOCK + (N % THREADS_PER_BLOCK == 0 ? 0 : 1);
 #define GCONST 0.0003f
 #define EPS2 0.001f
 __device__ float2 v_device[N];
 __shared__ float2 shPosition[THREADS_PER_BLOCK];
+
 __device__ float2 force(float2 p2, float2 p, float2 f)
 {
 	float recrd,recrd3;
@@ -18,6 +20,7 @@ __device__ float2 force(float2 p2, float2 p, float2 f)
 	f.y +=  (r.y * GCONST / recrd3 );
 	return f;
 }
+
 __device__ float2 accumulate_tile(float2 p, float2 f)
 {
 	int i;
@@ -25,6 +28,7 @@ __device__ float2 accumulate_tile(float2 p, float2 f)
 		f = force(shPosition[i], p, f);
 	return f;
 }
+
 __global__ void moveParDevice_VBO2(float2 *p_device, float dt)
 {
 	int k = blockIdx.x * blockDim.x + threadIdx.x;
@@ -50,6 +54,7 @@ __global__ void moveParDevice_VBO2(float2 *p_device, float dt)
 	p_device[k]=p;
 	v_device[k]=v;
 }
+
 __global__ void moveParDevice_VBO1(float2 *p_device, float dt)
 { 
 	int k = blockIdx.x * blockDim.x + threadIdx.x;
@@ -73,6 +78,7 @@ __global__ void moveParDevice_VBO1(float2 *p_device, float dt)
 	p_device[k]=p;
 	v_device[k]=v;
 }
+
 void call_movepar_VBO(float2 *points_device, float dt)
 {
 	moveParDevice_VBO2 <<< NUM_BLOCKS, THREADS_PER_BLOCK >>> (points_device, dt);

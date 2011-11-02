@@ -1,5 +1,6 @@
 # Add source files here
-EXECUTABLE	:= matyka_particle
+EXECUTABLE	:= trunk
+
 # Cuda source files (compiled with cudacc)
 CUFILES		:= kernels.cu \
 
@@ -10,7 +11,6 @@ USEGLLIB	     := 1
 USEPARAMGL	     := 1
 USEGLUT		     := 1
 USECUFFT         := 1
-#USECUDPP             := 1
 USERENDERCHECKGL     := 1
 USENEWINTEROP        := 1
 
