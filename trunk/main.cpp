@@ -96,7 +96,6 @@ void idleFunction(void)
 
 void keyFunction(unsigned char key, int x, int y) 
 {
-
 	if (key == 27)
 		exit(0);
 }
@@ -110,12 +109,14 @@ int main(int argc, char **argv)
 	glutInitWindowSize(820,820);
 	glutCreateWindow("CUDA points");
 	init();
-	// register callbacks
+	
+    // register callbacks
 	glutDisplayFunc(renderScene);
 	glutReshapeFunc(changeSize);
 	glutIdleFunc(idleFunction);
 	glutKeyboardFunc(keyFunction);
-	// enter GLUT event processing cycle
+	
+    // enter GLUT event processing cycle
 	glutMainLoop();
 	cudaGraphicsUnregisterResource(pointsVBO_Resource);
 	glDeleteBuffers(1, &pointsVBO);
