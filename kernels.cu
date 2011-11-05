@@ -1,5 +1,5 @@
 #include <cuda.h>
-#include "kernels.h"
+#include <kernels.h>
 
 #define THREADS_PER_BLOCK 64
 const int NUM_BLOCKS = N / THREADS_PER_BLOCK + (N % THREADS_PER_BLOCK == 0 ? 0 : 1);

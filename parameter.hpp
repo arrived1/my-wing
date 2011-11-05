@@ -1,36 +1,57 @@
 #ifndef PARAMETER_HPP
 #define PARAMETER_HPP
 
-namespace parameter
+struct Parameter
 {
-    const int width = 1200;
-    const int height = 800;
-    const int a = 100;
-    
-    const int maxParticles = 32000; 
+    Parameter()
+        : width(1200),
+        height(800),
+        a(100),
+        maxParticles(32000),
+        inertia(0.1)
+    {
+        fullscreen = false;
+        buttonState = 0;
+        camera_trans[0] = 0;
+        camera_trans[1] = 0;
+        camera_trans[2] = -3;
+        camera_rot[0] = 0;
+        camera_rot[1] = 0;
+        camera_rot[2] = 0;
+        camera_trans_lag[0] = 0;
+        camera_trans_lag[1] = 0;
+        camera_trans_lag[2] = -3;
+        camera_rot_lag[0] = 0;
+        camera_rot_lag[1] = 0;
+        camera_rot_lag[2] = 0;
+    }
+        
+    const int width;
+    const int height;
+    const int a;
 
-    bool fullscreen = false;
-    bool punkty = true; //tymczasowe rozwiazanie do wywalenia pozniej
+    const int maxParticles;
+
+    bool fullscreen;
+    bool punkty;
 
     //do menu kontekstowego
-    enum { CUDA, EXIT, reset, wspol, pudelko, skrzydelko, punkty_kulki, sila };	
     bool g_keys[256]; // Keys Array
-    
+
     //parametry widoku - kamery
     int ox, oy;
-    int buttonState = 0;
-    float camera_trans[] = {0, 0, -3};
-    float camera_rot[] = {0, 0, 0};
-    float camera_trans_lag[] = {0, 0, -3};
-    float camera_rot_lag[] = {0, 0, 0};
-    const float inertia = 0.1;
+    int buttonState;
+    const float inertia;
+    float camera_trans[3];
+    float camera_rot[3];
+    float camera_trans_lag[3];
+    float camera_rot_lag[3];
     float modelView[16];
-
-    static float colors[12][3] = {     // tecza kolorow
-        {1.0f,0.5f,0.5f},{1.0f,0.75f,0.5f},{1.0f,1.0f,0.5f},{0.75f,1.0f,0.5f},
-        {0.5f,1.0f,0.5f},{0.5f,1.0f,0.75f},{0.5f,1.0f,1.0f},{0.5f,0.75f,1.0f},
-        {0.5f,0.5f,1.0f},{0.75f,0.5f,1.0f},{1.0f,0.5f,1.0f},{1.0f,0.5f,0.75f}
-    };
-} // namespace constant
+    //static float colors[12][3] = {     // tecza kolorow
+        //{1.0f,0.5f,0.5f},{1.0f,0.75f,0.5f},{1.0f,1.0f,0.5f},{0.75f,1.0f,0.5f},
+        //{0.5f,1.0f,0.5f},{0.5f,1.0f,0.75f},{0.5f,1.0f,1.0f},{0.5f,0.75f,1.0f},
+        //{0.5f,0.5f,1.0f},{0.75f,0.5f,1.0f},{1.0f,0.5f,1.0f},{1.0f,0.5f,0.75f}
+    //};
+};
 
 #endif // PARAMETER_HPP

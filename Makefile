@@ -5,7 +5,7 @@ EXECUTABLE	:= trunk
 CUFILES		:= kernels.cu \
 
 # C/C++ source files (compiled with gcc / c++)
-CCFILES		:= main.cpp \
+CCFILES		:= main.cpp helperFunctions.cpp
 
 USEGLLIB	     := 1
 USEPARAMGL	     := 1
