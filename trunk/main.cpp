@@ -12,10 +12,10 @@
 #include <helperFunctions.hpp>
 
 GLuint pointsVBO;
-float2 *pointsVBO_device; // device pointer for VBO
+float3 *pointsVBO_device; // device pointer for VBO
 struct cudaGraphicsResource *pointsVBO_Resource;
-float2 points[N];
-float2 velocities[N];
+float3 points[N];
+float3 velocities[N];
 Parameter parameter;
 
 void init(void)
@@ -28,15 +28,17 @@ void init(void)
     // points
     for(int k=0; k<N; k++)
     {
-        #define SCALE 100 //0.5
-        points[k] =		make_float2( SCALE*(rand()/float(RAND_MAX)-0.5), SCALE*(rand()/float(RAND_MAX)-0.5) ); 
-        velocities[k] =	make_float2(0,0);//0.01*sin(10*points[k].x), 0.01*sin(2*points[k].y) );
+        #define SCALE 1.5
+        points[k] =		make_float3(SCALE*(rand()/float(RAND_MAX)-0.5),
+                                    SCALE*(rand()/float(RAND_MAX)-0.5), 
+                                    SCALE*(rand()/float(RAND_MAX)-0.5) ); 
+        velocities[k] =	make_float3(1,2,1);//0.01*sin(10*points[k].x), 0.01*sin(2*points[k].y) );
     }
 	
     // copy velocity -> device
     void **v_device_addr;
     cudaGetSymbolAddress ((void **)&v_device_addr, "v_device");
-    cudaMemcpy (v_device_addr, velocities, sizeof(float2) * N,  cudaMemcpyHostToDevice );
+    cudaMemcpy (v_device_addr, velocities, sizeof(float3) * N,  cudaMemcpyHostToDevice );
 	
     // ------------ VBO
     // 1. generate vbo 2. activate (hook) 3. upload
@@ -123,7 +125,7 @@ int main(int argc, char **argv)
     // register callbacks
 	glutDisplayFunc(renderScene); //display
 	glutReshapeFunc(changeSize); //reshape
-    //glutIdleFunc(idleFunction);
+    glutIdleFunc(idleFunction);
     glutMouseFunc(mouse);
     glutMotionFunc(motion);
 	glutKeyboardFunc(keyFunction);
