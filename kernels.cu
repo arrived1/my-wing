@@ -92,9 +92,9 @@ __global__ void moveParDevice_VBO(float3 *p_device, float dt)
     
 	float3 v = v_device[k];
 	float3 p = p_device[k];
-	p.x = p.x + v.x * dt;
-	p.y = p.y + v.y * dt;
-	p.z = 50;//p.z + v.z * dt;
+	p.x += v.x * dt;
+	p.y += v.y * dt;
+	p.z += v.z * dt;
 	p_device[k]=p;
 	v_device[k]=v;
 }

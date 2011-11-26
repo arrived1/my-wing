@@ -1,4 +1,5 @@
 // nvcc main.cpp kernels.cu -lglut –lGLU
+#include <iostream>
 #include <cmath>
 #include <GL/glew.h>
 #include <cuda.h>
@@ -18,6 +19,20 @@ float3 points[N];
 float3 velocities[N];
 Parameter parameter;
 
+void initializePositionsAndVelocities()
+{
+    int counter = 0;
+	for(float x = -49; x < -39; x++)	//1000
+		for(float y = -5; y < 5; y++)
+			for(float z = -5; z < 5; z++)
+			{	
+				points[counter] = make_float3(x, y, z);
+                velocities[counter] = make_float3(10, 0, 0);
+				counter++;
+			}
+}
+
+
 void init(void)
 {
 	// GLEW library
@@ -25,16 +40,8 @@ void init(void)
 	if (GLEW_OK != err)		
         exit(0);
 	
-    // points
-    for(int k=0; k<N; k++)
-    {
-        #define SCALE 1.5
-        points[k] =		make_float3(SCALE*(rand()/float(RAND_MAX)-0.5),
-                                    SCALE*(rand()/float(RAND_MAX)-0.5), 
-                                    SCALE*(rand()/float(RAND_MAX)-0.5) ); 
-        velocities[k] =	make_float3(1,2,1);//0.01*sin(10*points[k].x), 0.01*sin(2*points[k].y) );
-    }
-	
+    initializePositionsAndVelocities();
+
     // copy velocity -> device
     void **v_device_addr;
     cudaGetSymbolAddress ((void **)&v_device_addr, "v_device");
@@ -71,12 +78,12 @@ void renderScene(void)
     renderBox(parameter.a);
 
 	glColor4f(1,1,1,0.7);
-	glPointSize(2.0);
+	glPointSize(3.0);
 	
     // draw vbo
-	glBindBuffer(GL_ARRAY_BUFFER, pointsVBO);
 	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(2, GL_FLOAT, 0, NULL);  
+	glVertexPointer(3, GL_FLOAT, 0, NULL); //(number of coordinates, type, stride, pointer)
+    //glColorPonter(_, _, _); //TODO: colors
 	glDrawArrays(GL_POINTS, 0, N);
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glutSwapBuffers();
@@ -95,8 +102,8 @@ void idleFunction(void)
 	cudaGraphicsMapResources(1, &pointsVBO_Resource, 0);
 	size_t num_bytes;
 	cudaGraphicsResourceGetMappedPointer((void**)&pointsVBO_device, &num_bytes, pointsVBO_Resource);
-		const float DT = 0.002f;
-		call_movepar_VBO(pointsVBO_device, DT);						
+	const float DT = 0.002f;
+	call_movepar_VBO(pointsVBO_device, DT);						
 	cudaGraphicsUnmapResources(1, &pointsVBO_Resource, 0);
 	
     // -- timer
