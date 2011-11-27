@@ -70,14 +70,14 @@ void init(void)
 
 
 
-void renderScene(void) 
+void renderScene1(void) 
 {
     camera();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     renderBox(parameter.a);
 
-	glColor4f(1,1,1,0.7);
+	glColor4f(1,1,0,0.7);
 	glPointSize(3.0);
 	
     // draw vbo
@@ -86,6 +86,121 @@ void renderScene(void)
     //glColorPonter(_, _, _); //TODO: colors
 	glDrawArrays(GL_POINTS, 0, N);
 	glDisableClientState(GL_VERTEX_ARRAY);
+	glutSwapBuffers();
+}
+
+#define STRINGIFY(A) #A
+
+// vertex shader
+const char *vertexShader = STRINGIFY(
+uniform float pointRadius;  // point size in world space
+uniform float pointScale;   // scale to calculate size in pixels
+uniform float densityScale;
+uniform float densityOffset;
+void main()
+{
+    // calculate window-space point size
+    vec3 posEye = vec3(gl_ModelViewMatrix * vec4(gl_Vertex.xyz, 1.0));
+    float dist = length(posEye);
+    gl_PointSize = pointRadius * (pointScale / dist);
+
+    gl_TexCoord[0] = gl_MultiTexCoord0;
+    gl_Position = gl_ModelViewProjectionMatrix * vec4(gl_Vertex.xyz, 1.0);
+
+    gl_FrontColor = gl_Color;
+}
+);
+
+// pixel shader for rendering points as shaded spheres
+const char *spherePixelShader = STRINGIFY(
+void main()
+{
+    const vec3 lightDir = vec3(0.577, 0.577, 0.577);
+
+    // calculate normal from texture coordinates
+    vec3 N;
+    N.xy = gl_TexCoord[0].xy*vec2(2.0, -2.0) + vec2(-1.0, 1.0);
+    float mag = dot(N.xy, N.xy);
+    if (mag > 1.0) discard;   // kill pixels outside circle
+    N.z = sqrt(1.0-mag);
+
+    // calculate lighting
+    float diffuse = max(0.0, dot(lightDir, N));
+
+    gl_FragColor = gl_Color * diffuse;
+}
+);
+
+GLuint compileProgram(const char *vsource, const char *fsource)
+{
+    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+
+    glShaderSource(vertexShader, 1, &vsource, 0);
+    glShaderSource(fragmentShader, 1, &fsource, 0);
+    
+    glCompileShader(vertexShader);
+    glCompileShader(fragmentShader);
+
+    GLuint program = glCreateProgram();
+
+    glAttachShader(program, vertexShader);
+    glAttachShader(program, fragmentShader);
+
+    glLinkProgram(program);
+
+    // check if program linked
+    GLint success = 0;
+    glGetProgramiv(program, GL_LINK_STATUS, &success);
+
+    if (!success) {
+        char temp[256];
+        glGetProgramInfoLog(program, 256, 0, temp);
+        printf("Failed to link program:\n%s\n", temp);
+        glDeleteProgram(program);
+        program = 0;
+    }
+
+    return program;
+}
+
+void renderScene(void)
+{
+    camera();
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    renderBox(parameter.a);
+    
+    GLuint m_program = compileProgram(vertexShader, spherePixelShader);
+    float m_fov = 60;
+
+    glEnable(GL_POINT_SPRITE_ARB);
+    glTexEnvi(GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE);
+    glEnable(GL_VERTEX_PROGRAM_POINT_SIZE_NV);
+    glDepthMask(GL_TRUE);
+    glEnable(GL_DEPTH_TEST);
+
+    glUseProgram(m_program);
+    glUniform1f( glGetUniformLocation(m_program, "pointScale"), parameter.height
+            / tanf(m_fov*0.5f*(float)M_PI/180.0f) );
+    glUniform1f( glGetUniformLocation(m_program, "pointRadius"), 0.1 );
+
+    glColor3f(1, 1, 0);
+
+        glBindBufferARB(GL_ARRAY_BUFFER_ARB, pointsVBO);
+
+        glEnableClientState(GL_VERTEX_ARRAY);                
+        glVertexPointer(3, GL_FLOAT, 0, 0);
+
+        glDrawArrays(GL_POINTS, 0, N);
+
+        glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+        glDisableClientState(GL_VERTEX_ARRAY); 
+        //glDisableClientState(GL_COLOR_ARRAY); 
+    
+    glUseProgram(0);
+    glDisable(GL_POINT_SPRITE_ARB);
+
 	glutSwapBuffers();
 }
 
