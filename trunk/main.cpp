@@ -10,6 +10,7 @@
 
 #include <kernels.h>
 #include <parameter.hpp>
+#include <wing.hpp>
 #include <helperFunctions.hpp>
 #include <shaders.hpp>
 
@@ -18,6 +19,7 @@ float3 *pointsVBO_device; // device pointer for VBO
 struct cudaGraphicsResource *pointsVBO_Resource;
 float3 points[N];
 float3 velocities[N];
+Wing wing;
 Parameter parameter;
 
 void initializePositionsAndVelocities()
@@ -74,7 +76,8 @@ void renderScene(void)
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     renderBox(parameter.a);
-    
+    renderWing();
+
     glEnable(GL_POINT_SPRITE_ARB);
     glTexEnvi(GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE);
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE_NV);
