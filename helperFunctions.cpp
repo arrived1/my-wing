@@ -33,6 +33,73 @@ GLuint compileProgram(const char *vsource, const char *fsource)
     return program;
 }
 
+void renderWing()
+{
+    glColor4f(0.9f, 0.9f, 0.9f, 1.0);
+
+    glDisable(GL_BLEND);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_COLOR_MATERIAL);
+    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+
+
+    GLUquadric * o = gluNewQuadric();
+    gluQuadricNormals(o, GLU_SMOOTH);
+
+
+    glPushMatrix();
+    glTranslatef(wing.pos.x, wing.pos.y, -parameter.a/2);
+    gluCylinder  (o, wing.radius, wing.radius, parameter.a, 20, 2);	// o, r_top, r_bot, wys, ile katow, ?
+    glPopMatrix();
+    gluDeleteQuadric(o);
+
+
+    glBegin(GL_QUADS );
+    glVertex3f(wing.pos.x, wing.pos.y + wing.radius, -parameter.a/2); //gora 
+    glVertex3f(wing.pos.x + wing.hight, 0, -parameter.a/2);
+    glVertex3f(wing.pos.x + wing.hight, 0, parameter.a/2);  
+    glVertex3f(wing.pos.x, wing.pos.y + wing.radius, parameter.a/2);
+
+    glVertex3f(wing.pos.x, wing.pos.y - wing.radius, -parameter.a/2);  //dol
+    glVertex3f(wing.pos.x + wing.hight, 0, -parameter.a/2);
+    glVertex3f(wing.pos.x + wing.hight, 0, parameter.a/2);  
+    glVertex3f(wing.pos.x, wing.pos.y - wing.radius, parameter.a/2);
+    glEnd();
+
+
+    glBegin(GL_TRIANGLES);
+    glVertex3f(wing.pos.x, wing.pos.y + wing.radius, -parameter.a/2);	//gora 
+    glVertex3f(wing.pos.x, wing.pos.y - wing.radius, -parameter.a/2);
+    glVertex3f(wing.pos.x + wing.hight, 0, -parameter.a/2);  
+
+    glVertex3f(wing.pos.x, wing.pos.y + wing.radius, parameter.a/2);  //dol
+    glVertex3f(wing.pos.x, wing.pos.y - wing.radius, parameter.a/2);
+    glVertex3f(wing.pos.x + wing.hight, 0, parameter.a/2); 
+    glEnd();
+
+
+    glBegin(GL_TRIANGLE_FAN);
+    for(float kat = 0.0f; kat < (2.0f*M_PI); kat += (M_PI/32.0f))
+    {
+        float x = wing.radius*sin(kat);
+        float y = wing.radius*cos(kat);
+        glVertex3f(x + wing.pos.x, y + wing.pos.y, -parameter.a/2);
+    }
+    glEnd();	
+
+    glBegin(GL_TRIANGLE_FAN);
+    for(float kat = 0.0f; kat < (2.0f*M_PI); kat += (M_PI/32.0f))
+    {
+        float x = wing.radius*sin(kat);
+        float y = wing.radius*cos(kat);
+        glVertex3f(x + wing.pos.x, y + wing.pos.y, parameter.a/2);
+    }
+    glEnd();
+
+    glDisable(GL_LIGHTING);
+}
+
 void renderBox(int boxSize)
 {
     glColor3f(1.0, 1.0, 1.0);
