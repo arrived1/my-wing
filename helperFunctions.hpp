@@ -10,6 +10,7 @@
 #include <parameter.hpp>
 extern Parameter parameter;
 
+GLuint compileProgram(const char *vsource, const char *fsource); 
 void renderBox(int boxSize);
 void changeSize(int w, int h); 
 void keyFunction(unsigned char key, int, int); 
