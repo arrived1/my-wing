@@ -17,7 +17,7 @@ void initializePositionsAndVelocities()
 			for(int z = -20; z < 20; z++)
 			{	
                 points[counter] = make_float3(x, y, z);
-                velocities[counter] = make_float3(10, 0, 0);
+                velocities[counter] = make_float3(float(rand() % 50), 0, 0);
                 counter++;
 			}
 }

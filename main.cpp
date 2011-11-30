@@ -23,7 +23,6 @@ float radius = 0.2;
 Wing wing;
 Parameter parameter;
 
-
 void init(void)
 {
 	// GLEW library
