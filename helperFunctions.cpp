@@ -1,5 +1,27 @@
 #include <helperFunctions.hpp>
 
+void initializePositionsAndVelocities()
+{
+    int counter = 0;
+	//for(float x = -49; x < -39; x++)	//1000
+		//for(float y = -5; y < 5; y++)
+			//for(float z = -5; z < 5; z++)
+			//{	
+				//points[counter] = make_float3(x, y, z);
+                //velocities[counter] = make_float3(10, 0, 0);
+				//counter++;
+			//}
+	
+    for(int x = -49; x < -29; x++)		//32000
+		for(int y = -20; y < 20; y++)
+			for(int z = -20; z < 20; z++)
+			{	
+                points[counter] = make_float3(x, y, z);
+                velocities[counter] = make_float3(10, 0, 0);
+                counter++;
+			}
+}
+
 GLuint compileProgram(const char *vsource, const char *fsource)
 {
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -43,17 +65,14 @@ void renderWing()
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 
-
     GLUquadric * o = gluNewQuadric();
     gluQuadricNormals(o, GLU_SMOOTH);
-
 
     glPushMatrix();
     glTranslatef(wing.pos.x, wing.pos.y, -parameter.a/2);
     gluCylinder  (o, wing.radius, wing.radius, parameter.a, 20, 2);	// o, r_top, r_bot, wys, ile katow, ?
     glPopMatrix();
     gluDeleteQuadric(o);
-
 
     glBegin(GL_QUADS );
     glVertex3f(wing.pos.x, wing.pos.y + wing.radius, -parameter.a/2); //gora 
@@ -67,7 +86,6 @@ void renderWing()
     glVertex3f(wing.pos.x, wing.pos.y - wing.radius, parameter.a/2);
     glEnd();
 
-
     glBegin(GL_TRIANGLES);
     glVertex3f(wing.pos.x, wing.pos.y + wing.radius, -parameter.a/2);	//gora 
     glVertex3f(wing.pos.x, wing.pos.y - wing.radius, -parameter.a/2);
@@ -77,7 +95,6 @@ void renderWing()
     glVertex3f(wing.pos.x, wing.pos.y - wing.radius, parameter.a/2);
     glVertex3f(wing.pos.x + wing.hight, 0, parameter.a/2); 
     glEnd();
-
 
     glBegin(GL_TRIANGLE_FAN);
     for(float kat = 0.0f; kat < (2.0f*M_PI); kat += (M_PI/32.0f))

@@ -1,13 +1,15 @@
 #ifndef PARAMETER_HPP
 #define PARAMETER_HPP
 
+#define N 32000 //16000
+
 struct Parameter
 {
     Parameter()
         : width(1200),
         height(800),
         a(100),
-        maxParticles(32000),
+        maxParticles(N),
         inertia(0.1)
     {
         fullscreen = false;

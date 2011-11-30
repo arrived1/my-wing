@@ -12,7 +12,10 @@
 
 extern Parameter parameter;
 extern Wing wing;
+extern float3 points[N];
+extern float3 velocities[N];
 
+void initializePositionsAndVelocities();
 GLuint compileProgram(const char *vsource, const char *fsource);
 void renderWing();
 void renderBox(int boxSize);

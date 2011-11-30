@@ -19,21 +19,10 @@ float3 *pointsVBO_device; // device pointer for VBO
 struct cudaGraphicsResource *pointsVBO_Resource;
 float3 points[N];
 float3 velocities[N];
+float radius = 0.2;
 Wing wing;
 Parameter parameter;
 
-void initializePositionsAndVelocities()
-{
-    int counter = 0;
-	for(float x = -49; x < -39; x++)	//1000
-		for(float y = -5; y < 5; y++)
-			for(float z = -5; z < 5; z++)
-			{	
-				points[counter] = make_float3(x, y, z);
-                velocities[counter] = make_float3(10, 0, 0);
-				counter++;
-			}
-}
 
 void init(void)
 {
@@ -76,7 +65,7 @@ void renderScene(void)
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     renderBox(parameter.a);
-    renderWing();
+    //renderWing();
 
     glEnable(GL_POINT_SPRITE_ARB);
     glTexEnvi(GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE);
@@ -85,12 +74,12 @@ void renderScene(void)
     glEnable(GL_DEPTH_TEST);
     
     GLuint program = compileProgram(vertexShader, spherePixelShader);
-    float fov = 60;
+    float fov = 90.0; //60
 
     glUseProgram(program);
-    glUniform1f( glGetUniformLocation(program, "pointScale"), parameter.height
-            / tanf(fov*0.5f*(float)M_PI/180.0f) );
-    glUniform1f( glGetUniformLocation(program, "pointRadius"), 0.1 );
+    glUniform1f(glGetUniformLocation(program, "pointScale"), 
+            parameter.height / tanf(fov*0.5f*(float)M_PI/180.0f));
+    glUniform1f(glGetUniformLocation(program, "pointRadius"), radius);
 
     glColor3f(1, 1, 0);
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, pointsVBO);
@@ -119,7 +108,7 @@ void idleFunction(void)
 	cudaGraphicsMapResources(1, &pointsVBO_Resource, 0);
 	size_t num_bytes;
 	cudaGraphicsResourceGetMappedPointer((void**)&pointsVBO_device, &num_bytes, pointsVBO_Resource);
-	const float DT = 0.002f;
+	const float DT = 0.005;//0.002f;
 	call_movepar_VBO(pointsVBO_device, DT);						
 	cudaGraphicsUnmapResources(1, &pointsVBO_Resource, 0);
 	
