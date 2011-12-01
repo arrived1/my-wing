@@ -15,11 +15,12 @@ void initializePositionsAndVelocities()
     for(int x = -49; x < -29; x++)		//32000
 		for(int y = -20; y < 20; y++)
 			for(int z = -20; z < 20; z++)
-			{	
+			{
                 points[counter] = make_float3(x, y, z);
                 velocities[counter] = make_float3(float(rand() % 50), 0, 0);
-                counter++;
+		        std::cout << "Building particle number: " << 1 + counter++ << "\r";
 			}
+    std::cout << std::endl;
 }
 
 GLuint compileProgram(const char *vsource, const char *fsource)

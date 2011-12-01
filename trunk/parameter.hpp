@@ -2,13 +2,14 @@
 #define PARAMETER_HPP
 
 #define N 32000 //16000
+#define box 100
 
 struct Parameter
 {
     Parameter()
         : width(1200),
         height(800),
-        a(100),
+        a(box),
         maxParticles(N),
         inertia(0.1)
     {

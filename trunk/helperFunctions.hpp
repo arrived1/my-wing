@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <GL/glew.h>
 #include <GL/glut.h>
+#include <iostream>
 
 #include <parameter.hpp>
 #include <wing.hpp>
