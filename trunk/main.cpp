@@ -20,7 +20,7 @@ struct cudaGraphicsResource *pointsVBO_Resource;
 float3 points[N];
 float3 velocities[N];
 const float radius = 5.f;
-const float DT = 0.f; //0.005f; //0.002f;
+const float DT = 0.005f; //0.002f;
 Wing wing;
 Parameter parameter;
 
@@ -65,7 +65,7 @@ void renderScene(void)
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     renderBox(parameter.a);
-    //renderWing();
+    renderWing();
 
     glEnable(GL_POINT_SPRITE_ARB);
     glTexEnvi(GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE);
