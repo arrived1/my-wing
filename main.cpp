@@ -78,7 +78,7 @@ void renderScene(void)
     glUseProgram(program);
     glUniform1f(glGetUniformLocation(program, "pointScale"), 
             parameter.height / tanf(fov*0.5f*(float)M_PI/180.0f));
-    glUniform1f(glGetUniformLocation(program, "pointRadius"), radius);
+    glUniform1f(glGetUniformLocation(program, "pointRadius"), 15);
 
     glColor3f(1, 1, 0);
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, pointsVBO);
