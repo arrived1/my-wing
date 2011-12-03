@@ -12,21 +12,38 @@ __device__ float3 vNext_device[N];
 __device__ float3 pNext_device[N];
 __device__ float3 pPrev_device[N];
 
-
-
 __device__ void Euler(float3 *p_device, float3 acceleration, int idx, float dt)
 {
     vNext_device[idx] = v_device[idx] + (acceleration * dt);
     pNext_device[idx] = p_device[idx] + (vNext_device[idx] * dt);
 }
 
+__device__ void calculateForce(float3 *p_device, int idx, float dt)
+{
+    float mass = 1.f;
+    float inversedMass = 1.f / mass;
+    float3 force = make_float3(5, 0, 0);
+    
+    float3 acceleration = inversedMass * force; 
+    Euler(p_device, acceleration, idx, dt);
+}
+
+__global__ void prepareMove(float3 *p_device, float dt)
+{ 
+	int idx = blockIdx.x * blockDim.x + threadIdx.x;
+	if(idx >= N) return;
+   
+    calculateForce(p_device, idx, dt);
+}
 
 __global__ void moveParticle(float3 *p_device, float dt)
 { 
 	int idx = blockIdx.x * blockDim.x + threadIdx.x;
 	if(idx >= N) return;
-    
-    p_device[idx] = p_device[idx] + (v_device[idx] * dt);
+   
+    pPrev_device[idx] = p_device[idx];
+    p_device[idx] = pNext_device[idx];
+    v_device[idx] = vNext_device[idx];
 }
 
 __global__ void particleCollisionWithWalls(float3 *p_device, float dt)
@@ -81,9 +98,11 @@ __global__ void particleCollisionWithOtherParticles(float3 *p_device, float dt)
 
 void call_movepar_VBO(float3 *points_device, float dt)
 {
+    prepareMove <<< NUM_BLOCKS, THREADS_PER_BLOCK >>> (points_device, dt);
+    /*particleCollisionWithOtherParticles <<< NUM_BLOCKS, THREADS_PER_BLOCK >>> (points_device, dt);*/
     moveParticle <<< NUM_BLOCKS, THREADS_PER_BLOCK >>> (points_device, dt);
     particleCollisionWithWalls <<< NUM_BLOCKS, THREADS_PER_BLOCK >>> (points_device, dt);
-    /*particleCollisionWithOtherParticles <<< NUM_BLOCKS, THREADS_PER_BLOCK >>> (points_device, dt);*/
+
 	cudaThreadSynchronize();
 }
 
