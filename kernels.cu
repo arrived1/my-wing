@@ -1,12 +1,105 @@
 #include <cuda.h>
 #include <kernels.h>
+#include <operatorsCuda.h>
 
 #define THREADS_PER_BLOCK 64
 const int NUM_BLOCKS = N / THREADS_PER_BLOCK + (N % THREADS_PER_BLOCK == 0 ? 0 : 1);
 #define GCONST 0.0003f
 #define EPS2 0.001f
+
 __device__ float3 v_device[N];
-__shared__ float3 shPosition[THREADS_PER_BLOCK];
+__device__ float3 vNext_device[N];
+__device__ float3 pNext_device[N];
+__device__ float3 pPrev_device[N];
+
+
+
+__device__ void Euler(float3 *p_device, float3 acceleration, int idx, float dt)
+{
+    vNext_device[idx] = v_device[idx] + (acceleration * dt);
+    pNext_device[idx] = p_device[idx] + (vNext_device[idx] * dt);
+}
+
+
+__global__ void moveParticle(float3 *p_device, float dt)
+{ 
+	int idx = blockIdx.x * blockDim.x + threadIdx.x;
+	if(idx >= N) return;
+    
+    p_device[idx] = p_device[idx] + (v_device[idx] * dt);
+}
+
+__global__ void particleCollisionWithWalls(float3 *p_device, float dt)
+{ 
+	int idx = blockIdx.x * blockDim.x + threadIdx.x;
+	if(idx >= N) return;
+    
+	float3 v = v_device[idx];
+	float3 p = p_device[idx];
+	
+    if(p.x < -box/2)
+        p.x = box/2;
+    if(p.x > box/2)
+        p.x = -box/2;
+    if(p.y < -box/2)
+    {
+        p.y = -box - p.y;
+        v.y = -v.y;
+    }
+    if(p.y > box/2)
+    {
+        p.y = box - p.y;
+        v.y = -v.y;
+    }
+    if(p.z < -box/2)
+    {
+        p.z = -box - p.z;
+        v.z = -v.z;
+    }
+    if(p.z > box/2)
+    {
+        p.z = box - p.z;
+        v.z = -v.z;
+    }
+    
+    p_device[idx]=p;
+	v_device[idx]=v;
+}
+
+__global__ void particleCollisionWithOtherParticles(float3 *p_device, float dt)
+{
+
+	int idx = blockIdx.x * blockDim.x + threadIdx.x;
+	int idy = blockIdx.y * blockDim.y + threadIdx.y;
+	/*float e = 0.9f;*/
+	
+    if(idx >= N || idy >= N) return;
+
+    /*float next*/
+
+}
+
+void call_movepar_VBO(float3 *points_device, float dt)
+{
+    moveParticle <<< NUM_BLOCKS, THREADS_PER_BLOCK >>> (points_device, dt);
+    particleCollisionWithWalls <<< NUM_BLOCKS, THREADS_PER_BLOCK >>> (points_device, dt);
+    /*particleCollisionWithOtherParticles <<< NUM_BLOCKS, THREADS_PER_BLOCK >>> (points_device, dt);*/
+	cudaThreadSynchronize();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*__device__ float3 force(float3 p2, float3 p, float3 f)*/
 /*{*/
@@ -84,61 +177,3 @@ __shared__ float3 shPosition[THREADS_PER_BLOCK];
 	/*p_device[k]=p;*/
 	/*v_device[k]=v;*/
 /*}*/
-
-__global__ void moveParDevice_VBO(float3 *p_device, float dt)
-{ 
-	int k = blockIdx.x * blockDim.x + threadIdx.x;
-	if(k>=N) return;
-    
-	float3 v = v_device[k];
-	float3 p = p_device[k];
-	p.x += v.x * dt;
-	p.y += v.y * dt;
-	p.z += v.z * dt;
-	p_device[k]=p;
-	v_device[k]=v;
-}
-
-__global__ void bounceParWalls(float3 *p_device, float dt)
-{ 
-	int k = blockIdx.x * blockDim.x + threadIdx.x;
-	if(k>=N) return;
-    
-	float3 v = v_device[k];
-	float3 p = p_device[k];
-	
-    if(p.x < -box/2)
-        p.x = box/2;
-    if(p.x > box/2)
-        p.x = -box/2;
-    if(p.y < -box/2)
-    {
-        p.y = -box - p.y;
-        v.y = -v.y;
-    }
-    if(p.y > box/2)
-    {
-        p.y = box - p.y;
-        v.y = -v.y;
-    }
-    if(p.z < -box/2)
-    {
-        p.z = -box - p.z;
-        v.z = -v.z;
-    }
-    if(p.z > box/2)
-    {
-        p.z = box - p.z;
-        v.z = -v.z;
-    }
-    
-    p_device[k]=p;
-	v_device[k]=v;
-}
-
-void call_movepar_VBO(float3 *points_device, float dt)
-{
-	moveParDevice_VBO <<< NUM_BLOCKS, THREADS_PER_BLOCK >>> (points_device, dt);
-    bounceParWalls <<< NUM_BLOCKS, THREADS_PER_BLOCK >>> (points_device, dt);
-	cudaThreadSynchronize();
-}
