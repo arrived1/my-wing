@@ -12,7 +12,8 @@ void initializePositionsAndVelocities()
                     for(float z = -5; z < 5; z++)
                     {	
                         points[counter] = make_float3(x, y, z);
-                        velocities[counter] = make_float3(10, 0, 0);
+                        velocities[counter] = make_float3(float(rand() % 50), 0, 0);
+                        //velocities[counter] = make_float3(10, 0, 0);
                         std::cout << "Building particle number: " << 1 + counter++ << "\r";
                     }
             break;
@@ -86,37 +87,37 @@ void renderWing()
 
     glPushMatrix();
     glTranslatef(wing.pos.x, wing.pos.y, -parameter.a/2);
-    gluCylinder  (o, wing.radius, wing.radius, parameter.a, 20, 2);	// o, r_top, r_bot, wys, ile katow, ?
+    gluCylinder  (o, wing.wingRadius, wing.wingRadius, parameter.a, 20, 2);	// o, r_top, r_bot, wys, ile katow, ?
     glPopMatrix();
     gluDeleteQuadric(o);
 
     glBegin(GL_QUADS );
-    glVertex3f(wing.pos.x, wing.pos.y + wing.radius, -parameter.a/2); //gora 
+    glVertex3f(wing.pos.x, wing.pos.y + wing.wingRadius, -parameter.a/2); //gora 
     glVertex3f(wing.pos.x + wing.hight, 0, -parameter.a/2);
     glVertex3f(wing.pos.x + wing.hight, 0, parameter.a/2);  
-    glVertex3f(wing.pos.x, wing.pos.y + wing.radius, parameter.a/2);
+    glVertex3f(wing.pos.x, wing.pos.y + wing.wingRadius, parameter.a/2);
 
-    glVertex3f(wing.pos.x, wing.pos.y - wing.radius, -parameter.a/2);  //dol
+    glVertex3f(wing.pos.x, wing.pos.y - wing.wingRadius, -parameter.a/2);  //dol
     glVertex3f(wing.pos.x + wing.hight, 0, -parameter.a/2);
     glVertex3f(wing.pos.x + wing.hight, 0, parameter.a/2);  
-    glVertex3f(wing.pos.x, wing.pos.y - wing.radius, parameter.a/2);
+    glVertex3f(wing.pos.x, wing.pos.y - wing.wingRadius, parameter.a/2);
     glEnd();
 
     glBegin(GL_TRIANGLES);
-    glVertex3f(wing.pos.x, wing.pos.y + wing.radius, -parameter.a/2);	//gora 
-    glVertex3f(wing.pos.x, wing.pos.y - wing.radius, -parameter.a/2);
+    glVertex3f(wing.pos.x, wing.pos.y + wing.wingRadius, -parameter.a/2);	//gora 
+    glVertex3f(wing.pos.x, wing.pos.y - wing.wingRadius, -parameter.a/2);
     glVertex3f(wing.pos.x + wing.hight, 0, -parameter.a/2);  
 
-    glVertex3f(wing.pos.x, wing.pos.y + wing.radius, parameter.a/2);  //dol
-    glVertex3f(wing.pos.x, wing.pos.y - wing.radius, parameter.a/2);
+    glVertex3f(wing.pos.x, wing.pos.y + wing.wingRadius, parameter.a/2);  //dol
+    glVertex3f(wing.pos.x, wing.pos.y - wing.wingRadius, parameter.a/2);
     glVertex3f(wing.pos.x + wing.hight, 0, parameter.a/2); 
     glEnd();
 
     glBegin(GL_TRIANGLE_FAN);
     for(float kat = 0.0f; kat < (2.0f*M_PI); kat += (M_PI/32.0f))
     {
-        float x = wing.radius*sin(kat);
-        float y = wing.radius*cos(kat);
+        float x = wing.wingRadius*sin(kat);
+        float y = wing.wingRadius*cos(kat);
         glVertex3f(x + wing.pos.x, y + wing.pos.y, -parameter.a/2);
     }
     glEnd();	
@@ -124,8 +125,8 @@ void renderWing()
     glBegin(GL_TRIANGLE_FAN);
     for(float kat = 0.0f; kat < (2.0f*M_PI); kat += (M_PI/32.0f))
     {
-        float x = wing.radius*sin(kat);
-        float y = wing.radius*cos(kat);
+        float x = wing.wingRadius*sin(kat);
+        float y = wing.wingRadius*cos(kat);
         glVertex3f(x + wing.pos.x, y + wing.pos.y, parameter.a/2);
     }
     glEnd();

@@ -19,7 +19,6 @@ float3 *pointsVBO_device; // device pointer for VBO
 struct cudaGraphicsResource *pointsVBO_Resource;
 float3 points[N];
 float3 velocities[N];
-const float radius = 5.f;
 const float DT = 0.005f; //0.002f;
 Wing wing;
 Parameter parameter;

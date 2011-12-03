@@ -1,4 +1,6 @@
 #include <cuda.h>
+#include <iostream>
+
 #include <kernels.h>
 #include <operatorsCuda.h>
 
@@ -88,12 +90,36 @@ __global__ void particleCollisionWithOtherParticles(float3 *p_device, float dt)
 
 	int idx = blockIdx.x * blockDim.x + threadIdx.x;
 	int idy = blockIdx.y * blockDim.y + threadIdx.y;
-	/*float e = 0.9f;*/
+    float e = 0.9f;
 	
     if(idx >= N || idy >= N) return;
 
-    /*float next*/
+    float nextDistance = length(pNext_device[idx] - pNext_device[idy]);
+    float r = 2 * radius;
+    float mass = 1.f;
+    float reversedMass = 1.f / mass;
 
+    if(nextDistance <= r)
+    {
+        float3 n = p_device[idx] - p_device[idy];
+        normalize(n);
+
+        float reducedMass = 1 / ( 2 * reversedMass);
+        float dvn = (v_device[idx] - v_device[idy]) * n;
+        float jj = - reducedMass * (e + 1.f) * dvn;
+
+        float3 vx = v_device[idx] + (n * ( jj * reversedMass));
+        float3 vy = v_device[idy] - (n * ( jj * reversedMass));
+
+        v_device[idx] = vx;
+        v_device[idy] = vy;
+
+        p_device[idx] = p_device[idx] + (n * (r - nextDistance));
+        p_device[idy] = p_device[idy] - (n * (r - nextDistance));
+
+        calculateForce(p_device, idx, dt);
+        calculateForce(p_device, idy, dt);
+    }
 }
 
 void call_movepar_VBO(float3 *points_device, float dt)
