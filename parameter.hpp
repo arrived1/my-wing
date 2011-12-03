@@ -3,6 +3,7 @@
 
 #define N 1000//32000 //16000
 #define box 100
+#define radius 5.f
 
 struct Parameter
 {
