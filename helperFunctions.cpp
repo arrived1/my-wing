@@ -3,23 +3,38 @@
 void initializePositionsAndVelocities()
 {
     int counter = 0;
-	//for(float x = -49; x < -39; x++)	//1000
-		//for(float y = -5; y < 5; y++)
-			//for(float z = -5; z < 5; z++)
-			//{	
-				//points[counter] = make_float3(x, y, z);
-                //velocities[counter] = make_float3(10, 0, 0);
-				//counter++;
-			//}
-	
-    for(int x = -49; x < -29; x++)		//32000
-		for(int y = -20; y < 20; y++)
-			for(int z = -20; z < 20; z++)
-			{
-                points[counter] = make_float3(x, y, z);
-                velocities[counter] = make_float3(float(rand() % 50), 0, 0);
-		        std::cout << "Building particle number: " << 1 + counter++ << "\r";
-			}
+    switch(N)
+    {
+        case 1000 :
+        {
+            for(float x = -49; x < -39; x++)	//1000
+                for(float y = -5; y < 5; y++)
+                    for(float z = -5; z < 5; z++)
+                    {	
+                        points[counter] = make_float3(x, y, z);
+                        velocities[counter] = make_float3(10, 0, 0);
+                        std::cout << "Building particle number: " << 1 + counter++ << "\r";
+                    }
+            break;
+        }
+        case 32000 :
+        {	
+            for(int x = -49; x < -29; x++)		//32000
+                for(int y = -20; y < 20; y++)
+                    for(int z = -20; z < 20; z++)
+                {
+                    points[counter] = make_float3(x, y, z);
+                    velocities[counter] = make_float3(float(rand() % 50), 0, 0);
+                    std::cout << "Building particle number: " << 1 + counter++ << "\r";
+                }
+            break;
+        }
+        default :
+        {
+            std::cout << "Wrong particle number!" << std::endl;
+            exit(0);
+        }
+    }
     std::cout << std::endl;
 }
 

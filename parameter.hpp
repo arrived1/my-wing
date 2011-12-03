@@ -1,7 +1,7 @@
 #ifndef PARAMETER_HPP
 #define PARAMETER_HPP
 
-#define N 32000 //16000
+#define N 1000//32000 //16000
 #define box 100
 
 struct Parameter

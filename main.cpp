@@ -19,7 +19,8 @@ float3 *pointsVBO_device; // device pointer for VBO
 struct cudaGraphicsResource *pointsVBO_Resource;
 float3 points[N];
 float3 velocities[N];
-const float radius = 0.2;
+const float radius = 5.f;
+const float DT = 0.f; //0.005f; //0.002f;
 Wing wing;
 Parameter parameter;
 
@@ -78,7 +79,7 @@ void renderScene(void)
     glUseProgram(program);
     glUniform1f(glGetUniformLocation(program, "pointScale"), 
             parameter.height / tanf(fov*0.5f*(float)M_PI/180.0f));
-    glUniform1f(glGetUniformLocation(program, "pointRadius"), 15);
+    glUniform1f(glGetUniformLocation(program, "pointRadius"), radius);
 
     glColor3f(1, 1, 0);
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, pointsVBO);
@@ -107,7 +108,6 @@ void idleFunction(void)
 	cudaGraphicsMapResources(1, &pointsVBO_Resource, 0);
 	size_t num_bytes;
 	cudaGraphicsResourceGetMappedPointer((void**)&pointsVBO_device, &num_bytes, pointsVBO_Resource);
-	const float DT = 0.005;//0.002f;
 	call_movepar_VBO(pointsVBO_device, DT);						
 	cudaGraphicsUnmapResources(1, &pointsVBO_Resource, 0);
 	
