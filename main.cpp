@@ -19,9 +19,10 @@ float3 *pointsVBO_device; // device pointer for VBO
 struct cudaGraphicsResource *pointsVBO_Resource;
 float3 points[N];
 float3 velocities[N];
-const float DT = 0.005f; //0.002f;
+const float DT = 0.002f; //0.002f;
 Wing wing;
 Parameter parameter;
+GLuint program;
 
 void init(void)
 {
@@ -56,6 +57,8 @@ void init(void)
 	glDisable(GL_DEPTH_TEST);							// Disable Depth Testing
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST);	// Really Nice Perspective Calculations
 	glHint(GL_POINT_SMOOTH_HINT,GL_NICEST);				// Really Nice Point Smoothing
+    
+    program = compileProgram(vertexShader, spherePixelShader);
 }
 
 void renderScene(void)
@@ -72,7 +75,7 @@ void renderScene(void)
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
     
-    GLuint program = compileProgram(vertexShader, spherePixelShader);
+
     float fov = 90.0; //60
 
     glUseProgram(program);
@@ -119,7 +122,7 @@ void idleFunction(void)
 	
     // -- timer
 	#define MILISEC 10000.0f
-	printf("%f\n",time/MILISEC);
+	//printf("%f\n",time/MILISEC);
 	glutPostRedisplay();
 }
 
