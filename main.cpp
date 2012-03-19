@@ -34,9 +34,9 @@ void init(void)
     initializePositionsAndVelocities();
 
     // copy velocity -> device
-    void **v_device_addr;
-    cudaGetSymbolAddress ((void **)&v_device_addr, "v_device");
-    cudaMemcpy (v_device_addr, velocities, sizeof(float3) * N,  cudaMemcpyHostToDevice );
+    //void **v_device_addr;
+    //cudaGetSymbolAddress ((void **)&v_device_addr, "v_device");
+    //cudaMemcpy (v_device_addr, velocities, sizeof(float3) * N,  cudaMemcpyHostToDevice );
 	
     // ------------ VBO
     // 1. generate vbo 2. activate (hook) 3. upload
@@ -67,7 +67,7 @@ void renderScene(void)
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     renderBox(parameter.a);
-    renderWing();
+    //renderWing();
 
     glEnable(GL_POINT_SPRITE_ARB);
     glTexEnvi(GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE);
@@ -110,8 +110,11 @@ void idleFunction(void)
 	cudaGraphicsMapResources(1, &pointsVBO_Resource, 0);
 	size_t num_bytes;
 	cudaGraphicsResourceGetMappedPointer((void**)&pointsVBO_device, &num_bytes, pointsVBO_Resource);
-	call_movepar_VBO(pointsVBO_device, DT);						
-	cudaGraphicsUnmapResources(1, &pointsVBO_Resource, 0);
+	
+    if(not parameter.pause)
+        call_movepar_VBO(pointsVBO_device, velocities, DT);						
+	
+    cudaGraphicsUnmapResources(1, &pointsVBO_Resource, 0);
 	
     // -- timer
 	cudaEventRecord( stop, 0 ); 
