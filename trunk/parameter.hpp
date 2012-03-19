@@ -1,10 +1,12 @@
 #ifndef PARAMETER_HPP
 #define PARAMETER_HPP
 
-#define N 1000
+#define N 2
+//#define N 10
+//#define N 1000
 //#define N 32000
 #define box 100
-#define radius 5.f
+#define radius 10.f
 
 struct Parameter
 {
@@ -13,9 +15,10 @@ struct Parameter
         height(800),
         a(box),
         maxParticles(N),
+        fullscreen(false),
+        pause(true),
         inertia(0.1)
     {
-        fullscreen = false;
         buttonState = 0;
         camera_trans[0] = 0;
         camera_trans[1] = 0;
@@ -39,7 +42,7 @@ struct Parameter
 
     bool fullscreen;
     bool punkty;
-
+    bool pause;
     //do menu kontekstowego
     bool g_keys[256]; // Keys Array
 

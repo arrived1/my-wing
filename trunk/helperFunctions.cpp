@@ -5,6 +5,40 @@ void initializePositionsAndVelocities()
     int counter = 0;
     switch(N)
     {
+        case 2 :
+        {
+            points[0] = make_float3(-15, 0, 0);
+            points[1] = make_float3(15, 0, 0);
+
+            velocities[0] = make_float3(2, 0, 0);
+            velocities[1] = make_float3(-2, 0, 0);
+            break;
+        }
+        case 10 :
+        {
+            points[0] = make_float3(-12, 1, 0);
+            points[1] = make_float3(-12, 2, 0);
+            points[2] = make_float3(-12, 3, 0);
+            points[3] = make_float3(-12, 4, 0);
+            points[4] = make_float3(-12, 5, 0);
+            points[5] = make_float3(-11, 1, 0);
+            points[6] = make_float3(-10, 2, 0);
+            points[7] = make_float3(-10, 3, 0);
+            points[8] = make_float3(-10, 4, 0);
+            points[9] = make_float3(-10, 5, 0);
+
+            //velocities[0] = make_float3(5, 0, 0);
+            //velocities[1] = make_float3(5, 0, 0);
+            //velocities[2] = make_float3(5, 0, 0);
+            //velocities[3] = make_float3(5, 0, 0);
+            //velocities[4] = make_float3(5, 0, 0);
+            //velocities[5] = make_float3(5, 0, 0);
+            //velocities[6] = make_float3(5, 0, 0);
+            //velocities[7] = make_float3(5, 0, 0);
+            //velocities[8] = make_float3(5, 0, 0);
+            //velocities[9] = make_float3(5, 0, 0);
+            break;
+        }
         case 1000 :
         {
             for(float x = -49; x < -39; x++)	//1000
@@ -183,8 +217,19 @@ void changeSize(int w, int h)
 
 void keyFunction(unsigned char key, int, int) 
 {
-	if (key == 27)
-        exit(0);
+    switch (key) 
+    {
+        case ' ':
+            parameter.pause = not parameter.pause;
+            break;
+		case 'q':
+			exit(0);
+			break;
+
+		default:
+            std::cout << "Nie znam tego klawisza\n";
+			break;
+	}
 }
 
 void motion(int x, int y)
