@@ -19,7 +19,7 @@ float3 *pointsVBO_device; // device pointer for VBO
 struct cudaGraphicsResource *pointsVBO_Resource;
 float3 points[N];
 float3 velocities[N];
-const float DT = 0.002f; //0.002f;
+const float DT = 0.02f; //0.002f;
 Wing wing;
 Parameter parameter;
 GLuint program;
@@ -33,10 +33,10 @@ void init(void)
 	
     initializePositionsAndVelocities();
 
-    // copy velocity -> device
-    //void **v_device_addr;
-    //cudaGetSymbolAddress ((void **)&v_device_addr, "v_device");
-    //cudaMemcpy (v_device_addr, velocities, sizeof(float3) * N,  cudaMemcpyHostToDevice );
+    //copy velocity -> device
+    void **v_device_addr;
+    cudaGetSymbolAddress ((void **)&v_device_addr, "vel");
+    cudaMemcpy (v_device_addr, velocities, sizeof(float3) * N,  cudaMemcpyHostToDevice );
 	
     // ------------ VBO
     // 1. generate vbo 2. activate (hook) 3. upload
@@ -74,7 +74,6 @@ void renderScene(void)
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE_NV);
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
-    
 
     float fov = 90.0; //60
 
@@ -112,7 +111,7 @@ void idleFunction(void)
 	cudaGraphicsResourceGetMappedPointer((void**)&pointsVBO_device, &num_bytes, pointsVBO_Resource);
 	
     if(not parameter.pause)
-        call_movepar_VBO(pointsVBO_device, velocities, DT);						
+        call_movepar_VBO(pointsVBO_device, DT);						
 	
     cudaGraphicsUnmapResources(1, &pointsVBO_Resource, 0);
 	
@@ -134,7 +133,7 @@ int main(int argc, char **argv)
     cudaGLSetGLDevice(0);
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_RGB | GLUT_DOUBLE); 
-	glutInitWindowPosition(100,100);
+	glutInitWindowPosition(200,100);
 	glutInitWindowSize(parameter.width, parameter.height); // Window Size If We Start In Windowed Mode
 	glutCreateWindow("Symulacja skrzydla");
 	init();

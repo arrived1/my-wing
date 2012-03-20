@@ -9,7 +9,7 @@ const int NUM_BLOCKS = N / THREADS_PER_BLOCK + (N % THREADS_PER_BLOCK == 0 ? 0 :
 #define GCONST 0.0003f
 #define EPS2 0.001f
 
-//__device__ float3 vel[N];
+__device__ float3 vel[N];
 __device__ float3 prevPos[N];
 
 __global__ void copyPreviousPositions(float3 *pos)
@@ -20,16 +20,15 @@ __global__ void copyPreviousPositions(float3 *pos)
     prevPos[idx] = pos[idx];
 }
 
-__global__ void moveParticle(float3 *pos, float3 *vel, float dt)
+__global__ void moveParticle(float3 *pos, float dt)
 { 
 	int idx = blockIdx.x * blockDim.x + threadIdx.x;
 	if(idx >= N) return;
    
     pos[idx] = pos[idx] + vel[idx] * dt;
-    /*vel[idx] = make_float3(0, 0, 0);*/
 }
 
-__global__ void particleCollisionWithWalls(float3 *pos, float3 *vel, float dt)
+__global__ void particleCollisionWithWalls(float3 *pos, float dt)
 { 
 	int idx = blockIdx.x * blockDim.x + threadIdx.x;
 	if(idx >= N) return;
@@ -62,11 +61,11 @@ __global__ void particleCollisionWithWalls(float3 *pos, float3 *vel, float dt)
         v.z = -v.z;
     }
     
-    pos[idx]=p;
-	vel[idx]=v;
+    pos[idx] = p;
+	vel[idx] = v;
 }
 
-__global__ void particleCollisionWithOtherParticles(float3 *pos, float3 *vel, float4 *col, float dt)
+__global__ void particleCollisionWithOtherParticles(float3 *pos, float4 *col, float dt)
 {
 
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -79,20 +78,21 @@ __global__ void particleCollisionWithOtherParticles(float3 *pos, float3 *vel, fl
     for(int i = 0; i < N; i++)
     {
         *col = make_float4(0, 0, 0, 0);
-        /*float nextDistance = length(prevPos[idx] - prevPos[i]);*/
         if(idx != i)
         {
-            float nextDistance = (prevPos[i].x - prevPos[idx].x) *(prevPos[i].x - prevPos[idx].x)+ 
+            /*float nextDistance = length(prevPos[i] - prevPos[idx]);*/
+            float nextDistance = (prevPos[i].x - prevPos[idx].x) *(prevPos[i].x - prevPos[idx].x)+
                 (prevPos[i].y - prevPos[idx].y)* (prevPos[i].y - prevPos[idx].y) +
                 (prevPos[i].z - prevPos[idx].z)* (prevPos[i].z - prevPos[idx].z);
 
             float r = radius * radius;
-            col[idx] = make_float4(pos[idx].x, nextDistance, idx, r);
+            col[idx] = make_float4(pos[idx].x, nextDistance, vel[idx].x, r);
 
             if(nextDistance <= r)
             {
-                col[idx] = make_float4(pos[idx].x, nextDistance, -69, -69);
-                vel[idx] = vel[idx] * (-1);   
+                /*vel[idx].x = 0;*/
+                col[idx] = make_float4(pos[idx].x, nextDistance, vel[idx].x, -69);
+                vel[idx] = vel[idx] * (-1); 
                 /*float3 n = prevPos[idx] - prevPos[i];*/
                 /*normalize(n);*/
 
@@ -110,18 +110,16 @@ __global__ void particleCollisionWithOtherParticles(float3 *pos, float3 *vel, fl
 float3 *dvel;
 float4 *particleCol;
 
-void call_movepar_VBO(float3 *dpos, float3 *hvel, float dt)
+void call_movepar_VBO(float3 *dpos, float dt)
 {
     float4 data[N] = { make_float4(0, 0, 0, 0), make_float4(0, 0, 0, 0)};
     cudaMalloc((void**) &particleCol, N * sizeof(float4));
-    cudaMalloc((void**) &dvel, N * sizeof(float3));
-    cudaMemcpy(dvel, hvel, N * sizeof(float3), cudaMemcpyHostToDevice);
     
     copyPreviousPositions <<< NUM_BLOCKS, THREADS_PER_BLOCK >>> (dpos);
-    moveParticle <<< NUM_BLOCKS, THREADS_PER_BLOCK >>> (dpos, dvel, dt);
-    particleCollisionWithOtherParticles <<< NUM_BLOCKS, THREADS_PER_BLOCK >>> (dpos, dvel, particleCol, dt);
+    moveParticle <<< NUM_BLOCKS, THREADS_PER_BLOCK >>> (dpos, dt);
+    particleCollisionWithOtherParticles <<< NUM_BLOCKS, THREADS_PER_BLOCK >>> (dpos, particleCol, dt);
     cudaThreadSynchronize();
-    particleCollisionWithWalls <<< NUM_BLOCKS, THREADS_PER_BLOCK >>> (dpos, dvel, dt);
+    particleCollisionWithWalls <<< NUM_BLOCKS, THREADS_PER_BLOCK >>> (dpos, dt);
 
 
 
@@ -130,7 +128,7 @@ void call_movepar_VBO(float3 *dpos, float3 *hvel, float dt)
     if(data[0].y || data[1].y)
     {
         std::cout << krok++ << ")\t";
-        std::cout << "(" << data[0].x << ", " << data[0].y << ", " << data[0].z << " , " << data[0].w <<")\t"
+        std::cout << "(" << data[0].x << ", " << data[0].y << ", " << data[0].z << " , " << data[0].w <<")\t\t"
                   << "(" << data[1].x << ", " << data[1].y << ", " << data[1].z << " , " << data[1].w <<")\n";
     }
 
