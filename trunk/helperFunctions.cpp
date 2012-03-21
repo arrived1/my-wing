@@ -10,8 +10,8 @@ void initializePositionsAndVelocities()
             points[0] = make_float3(-15, 0, 0);
             points[1] = make_float3(15, 0, 0);
 
-            velocities[0] = make_float3(1, 0, 0);
-            velocities[1] = make_float3(-3, 0, 0);
+            velocities[0] = make_float3(2, 0, 0);
+            velocities[1] = make_float3(-2, 0, 0);
             break;
         }
         case 10 :

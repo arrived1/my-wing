@@ -90,9 +90,17 @@ __global__ void particleCollisionWithOtherParticles(float3 *pos, float4 *col, fl
 
             if(nextDistance <= r)
             {
-                /*vel[idx].x = 0;*/
-                col[idx] = make_float4(pos[idx].x, nextDistance, vel[idx].x, -69);
-                vel[idx] = vel[idx] * (-1); 
+                vel[idx] = vel[idx] * (-1);
+                float odsun = (r - nextDistance) / 2 + 0.05f;
+                /*if(idx % 2)*/
+                    /*pos[idx] = pos[idx] - make_float3(odsun, 0, 0);*/
+                /*else*/
+                    /*pos[idx] = pos[idx] + make_float3(odsun, 0, 0);*/
+                float3 p = pos[idx];
+                normalize(p);
+                pos[idx] = pos[idx] + (p * odsun); 
+
+                col[idx] = make_float4(nextDistance, odsun, vel[idx].x, -69);
                 /*float3 n = prevPos[idx] - prevPos[i];*/
                 /*normalize(n);*/
 
